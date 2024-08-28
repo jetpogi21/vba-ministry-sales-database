@@ -446,6 +446,8 @@ Public Function DefaultFormLoad(frm As Form, PrimaryKey, Optional AutoWidth As B
             
         End If
     Next ctl
+    
+    TranslateToArabic frm
    
 End Function
 
@@ -495,6 +497,135 @@ Public Function DefaultMainFormLoad(frm As Form)
         Next ctl
    End If
    
+   TranslateToArabic frm
+   
+End Function
+
+Public Function DefaultReportLoad(frm As Object)
+
+    TranslateToArabic frm
+   
+End Function
+
+Public Function GetSubformOrReport(ctl As control) As Object
+    
+    Dim subfrm As Object
+    Set subfrm = GetSubformForm(ctl)
+    If subfrm Is Nothing Then
+        Set subfrm = GetSubformReport(ctl)
+    End If
+    
+    If Not subfrm Is Nothing Then
+        Set GetSubformOrReport = subfrm
+    End If
+    
+End Function
+
+Public Function GetSubformForm(ctl As control) As Object
+
+On Error GoTo ErrHandler:
+
+    Dim subfrm As Object
+    Set subfrm = ctl.Form
+    Set GetSubformForm = subfrm
+    Exit Function
+    
+ErrHandler:
+If Err.Number = 2467 Then
+    Exit Function
+End If
+
+End Function
+
+Public Function GetSubformReport(ctl As control) As Object
+
+On Error GoTo ErrHandler:
+
+    Dim subfrm As Object
+    Set subfrm = ctl.Report
+    Set GetSubformReport = subfrm
+    Exit Function
+    
+ErrHandler:
+If Err.Number = 2467 Then
+    Exit Function
+End If
+
+End Function
+
+
+Public Function TranslateToArabic(frm As Object)
+
+    If isFalse(g_Language) Then Exit Function
+    
+    If g_Language <> "Arabic" Then Exit Function
+
+    Dim ctl As control, subCtl As control, subfrm As Object
+    
+    For Each ctl In frm.Controls
+        Dim Translation, Caption, ControlSource
+        Select Case ctl.ControlType
+            Case acCommandButton, acLabel:
+                Caption = ctl.Caption
+                Translation = GetTranslation(Caption)
+                
+                If isFalse(Translation) Then GoTo GoToNextCtl
+                    
+                ctl.Caption = Translation
+               
+            Case acSubform:
+            
+On Error GoTo ErrHandler:
+                Set subfrm = GetSubformOrReport(ctl)
+                
+                If subfrm Is Nothing Then GoTo GoToNextCtl
+                
+                For Each subCtl In subfrm.Controls
+                    
+                    If IsObjectAReport(subfrm) Then
+                        TranslateToArabic subfrm
+                    Else
+                        Caption = GetDatasheetCaption(subCtl)
+                        
+                        If isFalse(Caption) Then GoTo GoToNextCtl
+                    
+                        Translation = GetTranslation(Caption)
+                        
+                        If isFalse(Translation) Then GoTo GoToNextCtl
+                            
+                        SetDatasheetCaption2 subCtl, Translation
+                    End If
+                Next subCtl
+        End Select
+        
+        If frm.Name <> "frmCustomDashboard" And frm.Name <> "frmNonAdminDashboard" Then GoTo GoToNextCtl
+            
+        If Not ctl.Name Like "txt*" Then GoTo GoToNextCtl
+           
+        ControlSource = ctl.ControlSource
+    
+        If isFalse(ControlSource) Then GoTo GoToNextCtl
+        
+        ControlSource = Replace(ControlSource, """", "")
+        Caption = Replace(ControlSource, "=", "")
+        
+        Translation = GetTranslation(Caption)
+                
+        If isFalse(Translation) Then GoTo GoToNextCtl
+            
+        ctl.ControlSource = "=" & Esc(Translation)
+        
+GoToNextCtl:
+    Next ctl
+    
+    Exit Function
+    
+ErrHandler:
+
+    If Err.Number = 2467 Then
+        GoTo GoToNextCtl
+    End If
+
 End Function
 
 Public Function OpenFormFromRecordReport(rpt As Report, fieldName, frmName)

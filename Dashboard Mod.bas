@@ -244,6 +244,8 @@ Public Function DashboardLoad(frm As Form, Optional ParentMenu = "")
     frmCustomdashboard_SyncMenu frm, ParentMenu
     CloseAllOtherSwitchboards ParentMenu
     
+    TranslateToArabic frm
+    
     'NoHasWriteToFilePrompt = False
     
     ''If Environ("computername") <> "LAPTOP-4EL19IO4" Then Shell ("OUTLOOK")

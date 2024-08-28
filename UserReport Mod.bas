@@ -18,6 +18,9 @@ Public Function UserReportCreate(frm As Object, FormTypeID)
             frm("DiscountGiven").Left = Right
             frm("lblDiscountGiven").Left = Right
             
+            Right = GetRight(frm("DiscountGiven"))
+            frm("UserName").Left = Right
+            frm("lblUserName").Left = Right
             
             CreateTotalControl frm, "StandardFee"
             CreateTotalControl frm, "ChargedAmount"
@@ -32,15 +35,84 @@ Public Function UserReportCreate(frm As Object, FormTypeID)
 
 End Function
 
-Public Function frmUserReports_fltrUser_AfterUpdate(frm As Form)
+Public Function Open_frmUserReports(frm As Form)
     
+    Dim fltrUser: fltrUser = frm("fltrUser")
+    Dim fltrDateFrom: fltrDateFrom = frm("fltrDateFrom")
+    Dim fltrDateTo: fltrDateTo = frm("fltrDateTo")
+    Dim fltrMinistry: fltrMinistry = frm("fltrMinistry")
+    Dim fltrTask: fltrTask = frm("fltrTask")
+    
+    CloseThisForm frm
+    
+    open_form "frmUserReports"
+    
+    Set frm = GetForm("frmUserReports")
+    
+    frm("fltrUser") = fltrUser
+    frm("fltrDateFrom") = fltrDateFrom
+    frm("fltrDateTo") = fltrDateTo
+    frm("fltrMinistry") = fltrMinistry
+    frm("fltrTask") = fltrTask
+    
+    frmUserReports_fltr_AfterUpdate frm
+    
+End Function
+
+Public Function Open_frmAnalytics(frm As Form)
+    
+    Dim fltrUser: fltrUser = frm("fltrUser")
+    Dim fltrDateFrom: fltrDateFrom = frm("fltrDateFrom")
+    Dim fltrDateTo: fltrDateTo = frm("fltrDateTo")
+    Dim fltrMinistry: fltrMinistry = frm("fltrMinistry")
+    Dim fltrTask: fltrTask = frm("fltrTask")
+    
+    CloseThisForm frm
+    
+    open_form "frmAnalytics"
+    
+    Set frm = GetForm("frmAnalytics")
+    
+    frm("fltrUser") = fltrUser
+    frm("fltrDateFrom") = fltrDateFrom
+    frm("fltrDateTo") = fltrDateTo
+    frm("fltrMinistry") = fltrMinistry
+    frm("fltrTask") = fltrTask
+    
+    frmAnalytics_OnLoad frm
+    
+End Function
+
+Public Function fltrMinistry_AfterUpdate(frm As Form)
+    
+    If frm.Name = "frmUserReports" Then
+        frmUserReports_fltr_AfterUpdate frm, True
+    Else
+        frmAnalytics_fltr_AfterUpdate frm, True
+    End If
+    
+End Function
+
+Public Function frmUserReports_fltr_AfterUpdate(frm As Form, Optional Reset_fltrTask As Boolean = False)
+    
+    Set_fltr_RowSource frm, Reset_fltrTask
     Set_subform_RecordSource frm
     
 End Function
 
-Public Function frmUserReports_fltrDateFrom_AfterUpdate(frm As Form)
+Public Function Reset_fltrs(frm As Form)
     
-    Set_subform_RecordSource frm
+    frm("fltrUser") = -2
+    frm("fltrDateFrom") = Null
+    frm("fltrDateTo") = Null
+    frm("fltrMinistry") = -2
+    frm("fltrTask") = -2
+    
+    If frm.Name = "frmUserReports" Then
+        frmUserReports_fltr_AfterUpdate frm
+    Else
+        frmAnalytics_fltr_AfterUpdate frm
+    End If
     
 End Function
 
@@ -56,18 +128,56 @@ Public Function frmUserReports_cmdPrint_OnClick(frm As Form)
     
 End Function
 
-Public Function frmUserReports_fltrDateTo_AfterUpdate(frm As Form)
-
-    Set_subform_RecordSource frm
+Private Sub Set_fltr_RowSource(frm As Form, Optional Reset_fltrTask As Boolean = False)
     
-End Function
+    Set_fltrUser_RowSource frm
+    
+    Dim sqlStr: sqlStr = "SELECT ALL_Number as MinistryID, [All] as Ministry FROM tblAlls where All_Number = -2"
+    sqlStr = "SELECT MinistryID,Ministry FROM tblMinistries ORDER BY Ministry UNION ALL " & sqlStr
+    
+    sqlStr = "SELECT * FROM (" & sqlStr & ") temp ORDER BY MinistryID"
+    frm("fltrMinistry").RowSource = sqlStr
+    
+    Dim fltrMinistry: fltrMinistry = frm("fltrMinistry")
+    
+    sqlStr = "SELECT ALL_Number as MinistryTaskID, [All] as Task FROM tblAlls where All_Number = -2"
+    Dim filterStr: filterStr = "MinistryTaskID > 0"
+    If Not isFalse(fltrMinistry) Then
+        If fltrMinistry > 0 Then filterStr = "MinistryID = " & fltrMinistry
+    End If
+    
+    sqlStr = "SELECT MinistryTaskID,Task FROM tblMinistryTasks WHERE " & filterStr & " ORDER BY Task UNION ALL " & sqlStr
+    sqlStr = "SELECT * FROM (" & sqlStr & ") temp ORDER BY MinistryTaskID"
+    frm("fltrTask").RowSource = sqlStr
+    Debug.Print "Reset_fltrTask: " & Reset_fltrTask
+    If Reset_fltrTask Then
+        frm("fltrTask") = -2
+    End If
+    
+End Sub
 
 Public Function frmUserReports_OnLoad(frm As Form)
 
     Set_subform_RecordSource frm
-    Set_fltrUser_RowSource frm
-    
+    Set_fltr_RowSource frm
+    TranslateToArabic frm
+    Set_fltr_AfterUpdate frm
+
 End Function
+
+Private Sub Set_fltr_AfterUpdate(frm As Form)
+    
+    'fltrUser,fltrDateFrom,fltrDateTo,fltrMinistry,fltrTask
+    Dim fltrArr As New clsArray: fltrArr.arr = "fltrUser,fltrDateFrom,fltrDateTo,fltrMinistry,fltrTask"
+    
+    Dim item, items As New clsArray
+    For Each item In fltrArr.arr
+        frm(item).AfterUpdate = "=frmUserReports_fltr_AfterUpdate([Form])"
+    Next item
+    
+    frm("fltrMinistry").AfterUpdate = "=fltrMinistry_AfterUpdate([Form])"
+    
+End Sub
 
 Private Sub Set_fltrUser_RowSource(frm As Form)
     Dim sqlStr: sqlStr = "SELECT ALL_Number as UserID, [All] as Username FROM tblAlls where All_Number = -2"
@@ -77,13 +187,17 @@ Private Sub Set_fltrUser_RowSource(frm As Form)
     frm("fltrUser").RowSource = sqlStr
 End Sub
 
+
+
 Private Sub Set_subform_RecordSource(frm As Form)
 
     Dim fltrUser: fltrUser = frm("fltrUser")
     Dim fltrDateFrom: fltrDateFrom = frm("fltrDateFrom")
     Dim fltrDateTo: fltrDateTo = frm("fltrDateTo")
+    Dim fltrMinistry: fltrMinistry = frm("fltrMinistry")
+    Dim fltrTask: fltrTask = frm("fltrTask")
     
-    Dim filterStr: filterStr = "TransactionID = 0"
+    Dim filterStr: filterStr = "TransactionID > 0"
     
     Dim fltrArr As New clsArray
     
@@ -91,12 +205,17 @@ Private Sub Set_subform_RecordSource(frm As Form)
         If fltrUser > 0 Then fltrArr.Add "CreatedBy = " & fltrUser
     End If
     
-    If Not isFalse(fltrDateFrom) Then
-        fltrArr.Add "TransactionDate >= " & EscapeString(fltrDateFrom, "tblTransactions", "TransactionDate")
+    If Not isFalse(fltrMinistry) Then
+        If fltrMinistry > 0 Then fltrArr.Add "MinistryID = " & fltrMinistry
     End If
     
-    If Not isFalse(fltrDateTo) Then
-        fltrArr.Add "TransactionDate <= " & EscapeString(fltrDateTo, "tblTransactions", "TransactionDate")
+    If Not isFalse(fltrTask) Then
+        If fltrTask > 0 Then fltrArr.Add "MinistryTaskID = " & fltrTask
+    End If
+    
+    If Not isFalse(fltrDateFrom) And Not isFalse(fltrDateTo) Then
+        fltrArr.Add "TransactionDate Between " & EscapeString(fltrDateFrom, "tblTransactions", "TransactionDate") & " AND " & _
+            EscapeString(fltrDateTo, "tblTransactions", "TransactionDate")
     End If
     
     If fltrArr.count > 0 Then
@@ -107,12 +226,50 @@ Private Sub Set_subform_RecordSource(frm As Form)
     SetQueryDefSQL "qryUserReports", sqlStr
     
     frm("subform").SourceObject = "Report.rptUserReports"
+    TranslateToArabic frm
     
 End Sub
 
+Public Function GetReportFilterCaption() As String
+
+    Dim frm As Form: Set frm = GetForm("frmUserReports")
+    
+    If frm Is Nothing Then Exit Function
+    
+    Dim fltrArr As New clsArray
+    
+    Dim fltrUser: fltrUser = frm("fltrUser")
+    Dim fltrDateFrom: fltrDateFrom = frm("fltrDateFrom")
+    Dim fltrDateTo: fltrDateTo = frm("fltrDateTo")
+    Dim fltrMinistry: fltrMinistry = frm("fltrMinistry")
+    Dim fltrTask: fltrTask = frm("fltrTask")
+    
+    If Not isFalse(fltrUser) Then
+        fltrArr.Add "User: " & frm("fltrUser").Column(1)
+    End If
+    
+    If Not isFalse(fltrMinistry) Then
+        If fltrMinistry > 0 Then fltrArr.Add "Ministry: " & frm("fltrMinistry").Column(1)
+    End If
+    
+    If Not isFalse(fltrTask) Then
+        If fltrTask > 0 Then fltrArr.Add "Task: " & frm("fltrTask").Column(1)
+    End If
+    
+    If Not isFalse(fltrDateFrom) And Not isFalse(fltrDateTo) Then
+        fltrArr.Add "Date: " & fltrDateFrom & " to " & fltrDateTo
+    End If
+    
+    If fltrArr.count > 0 Then
+        GetReportFilterCaption = fltrArr.JoinArr("  ")
+    End If
+    
+    
+End Function
+
 Public Sub rptUserReports_Create()
     
-    Const HEADER = "Per User Report"
+    Const HEADER = "By User Category"
     Const REPORT_NAME = "rptUserReports"
     Const RECORDSOURCE_NAME = ""
     
@@ -120,9 +277,11 @@ Public Sub rptUserReports_Create()
     SetCommonReportProperties rpt
     rpt.recordSource = RECORDSOURCE_NAME
     rpt.Caption = HEADER
+    rpt.OnLoad = "=DefaultReportLoad([Report])"
     
     Dim ctl As control
     Set ctl = CreateLabelControl(rpt, HEADER, "Header", "Heading1", acPageHeader)
+    Set ctl = CreateTextboxControl(rpt, "GetReportFilterCaption()", "txtFilterCaption", , "Heading3", acPageHeader)
     
     ''AUFTRAG --> CustomerOrderReportOrders
     Set ctl = CreateLabelControl(rpt, "TRANSACTIONS", "TRANSACTIONS", "Heading3")

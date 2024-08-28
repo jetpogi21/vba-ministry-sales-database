@@ -5,6 +5,7 @@ Option Explicit
 Public g_userID As Variant
 Public g_SiteAccess As Variant
 Public g_FrontEndVersion As Variant
+Public g_Language As Variant
 
 Public Const AllQuery As String = "SELECT All_Number,[All] from tblAlls Order by All_Number"
 

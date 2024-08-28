@@ -30,7 +30,8 @@ On Error GoTo Err_cmdLogin_Click
         
         ShowError "Invalid username/password."
     Else
-    
+        
+        g_Language = txtLanguage
         g_userID = UserID
         
         fieldValues.Add EscapeString(UserID, "tblLogs", "UserID")

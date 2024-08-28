@@ -15,6 +15,8 @@ Public Function TransactionCreate(frm As Object, FormTypeID)
             frm.OnCurrent = "=frmTransactions_OnCurrent([Form])"
             frm("MinistryID").AfterUpdate = "=frmTransactions_MinistryID_AfterUpdate([Form])"
             
+            frm.OnLoad = "=frmTransactions_OnLoad([Form])"
+            
         Case 5: ''Datasheet Form
             frm.AllowAdditions = False
             frm.AllowEdits = False
@@ -22,6 +24,9 @@ Public Function TransactionCreate(frm As Object, FormTypeID)
             
             frm("Timestamp").ColumnHidden = True
             frm("Timestamp").Tag = "alwaysHideOnDatasheet"
+            
+            SetDatasheetCaption2 frm("CreatedBy"), "User"
+            
         Case 6: ''Main Form
         
             Create_mainForm_CloseButton frm
@@ -32,6 +37,15 @@ Public Function TransactionCreate(frm As Object, FormTypeID)
             Dim contFrm As Form: Set contFrm = frm("subform").Form
     End Select
 
+End Function
+
+Public Function frmTransactions_OnLoad(frm As Form)
+
+    DefaultFormLoad frm, "TransactionID"
+    If GetIsAdmin Then Exit Function
+    
+    DoCmd.GoToRecord acDataForm, frm.Name, acNewRec
+    
 End Function
 
 Public Function frmTransactions_MinistryID_AfterUpdate(frm As Form)

@@ -5,6 +5,18 @@ Option Explicit
 Public ProgressPopup_StartTime As Long
 Public ProgressPopup_LastProgress As Double
 
+Public Function GetIsAdmin() As Boolean
+    
+    If isFalse(g_userID) Then Exit Function
+    
+    Dim IsAdmin: IsAdmin = ELookup("tblUsers", "UserID = " & g_userID, "IsAdmin")
+    
+    If isFalse(IsAdmin) Then Exit Function
+    
+    GetIsAdmin = CBool(IsAdmin)
+    
+End Function
+
 Public Function GetBottom(ctl As control)
     
     GetBottom = ctl.Top + ctl.Height
@@ -247,6 +259,25 @@ ErrHandler:
     If Err.Number = 2450 Then
         Exit Function
     End If
+    
+End Function
+
+Public Function GetTranslation(English)
+
+    GetTranslation = ELookup("tblTranslations", "English = " & Esc(English), "Arabic")
+    
+End Function
+
+
+Public Function GetDatasheetCaption(ctl As control)
+
+    GetDatasheetCaption = ctl.Properties("DatasheetCaption")
+    
+End Function
+
+Public Function SetDatasheetCaption2(ctl As control, DatasheetCaption)
+
+    ctl.Properties("DatasheetCaption") = DatasheetCaption
     
 End Function
 
@@ -1406,9 +1437,9 @@ Public Sub iit(condition)
     
     Dim arr As New clsArray
     arr.Add "If isFalse(" & condition & ") Then"
-    arr.Add vbTab & "MsgBox ""Some message here"", vbOKOnly"
-    arr.Add vbTab & "Exit Function"
-    arr.Add "End If"
+    arr.Add vbTab & vbTab & "MsgBox ""Some message here"", vbOKOnly"
+    arr.Add vbTab & vbTab & "Exit Function"
+    arr.Add vbTab & "End If"
     
     Dim str: str = arr.JoinArr(vbNewLine)
     CopyToClipboard str
