@@ -1,0 +1,6 @@
+﻿Option Compare Database
+Option Explicit
+
+Private Sub Form_AfterDelConfirm(Status As Integer)
+    dshtOrderDueDates_AfterUpdate Me.Form
+End Sub
