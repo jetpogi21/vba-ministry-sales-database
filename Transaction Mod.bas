@@ -6,7 +6,8 @@ Public Function TransactionCreate(frm As Object, FormTypeID)
 
     Select Case FormTypeID
         Case 4: ''Data Entry Form
-        
+            
+            frm("TransactionDate").Width = frm("TransactionDate").Width / 2
             frm("StandardFee").Width = frm("StandardFee").Width / 2
             frm("StandardFee").Locked = True
             frm("StandardFee").Enabled = False

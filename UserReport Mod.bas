@@ -29,6 +29,8 @@ Public Function UserReportCreate(frm As Object, FormTypeID)
             
             OffsetControlPositions frm, 50
             
+            frm.Printer.Orientation = acPRORLandscape
+            
         Case 9: ''Selector Form
             Dim contFrm As Form: Set contFrm = frm("subform").Form
     End Select
@@ -149,7 +151,7 @@ Private Sub Set_fltr_RowSource(frm As Form, Optional Reset_fltrTask As Boolean =
     sqlStr = "SELECT MinistryTaskID,Task FROM tblMinistryTasks WHERE " & filterStr & " ORDER BY Task UNION ALL " & sqlStr
     sqlStr = "SELECT * FROM (" & sqlStr & ") temp ORDER BY MinistryTaskID"
     frm("fltrTask").RowSource = sqlStr
-    Debug.Print "Reset_fltrTask: " & Reset_fltrTask
+    
     If Reset_fltrTask Then
         frm("fltrTask") = -2
     End If
@@ -278,6 +280,7 @@ Public Sub rptUserReports_Create()
     rpt.recordSource = RECORDSOURCE_NAME
     rpt.Caption = HEADER
     rpt.OnLoad = "=DefaultReportLoad([Report])"
+    rpt.Printer.Orientation = acPRORLandscape
     
     Dim ctl As control
     Set ctl = CreateLabelControl(rpt, HEADER, "Header", "Heading1", acPageHeader)
@@ -287,6 +290,8 @@ Public Sub rptUserReports_Create()
     Set ctl = CreateLabelControl(rpt, "TRANSACTIONS", "TRANSACTIONS", "Heading3")
     Offset_ctlPositions rpt, ctl, , InchToTwip(0.25)
     Set ctl = CreateSubformControl(rpt, "srptUserReports", "subUserReports", , "")
+    ctl.Left = 0
+    ctl.Width = InchToTwip(11 - 0.5)
     
 '    ''SUBLIEFERANTEN --> CustomerOrderReportSubSuppliers
 '    Set ctl = CreateLabelControl(rpt, "SUBLIEFERANTEN", "SUBLIEFERANTEN", "Heading3")

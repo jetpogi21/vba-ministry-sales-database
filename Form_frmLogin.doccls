@@ -7,7 +7,8 @@ On Error GoTo Err_cmdLogin_Click
     
     Dim UserID, computerName, fieldValues As New clsArray, sqlObj As New clsSQL
     Dim strcompUsername As String, strcompUserPass As String
-    strcompUsername = "StrComp(UserName,'" & UserName & "',0) = 0"
+    ''strcompUsername = "StrComp(UserName,'" & UserName & "',0) = 0" This is case sensitive
+    strcompUsername = "UserName = " & Esc(UserName)
     strcompUserPass = "StrComp(UserPassword,'" & UserPassword & "',0) = 0"
     
     UserID = ELookup("tblUsers", strcompUsername & " And " & strcompUserPass, "UserID")

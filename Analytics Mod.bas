@@ -116,7 +116,7 @@ Private Sub Set_fltr_RowSource(frm As Form, Optional Reset_fltrTask As Boolean =
     sqlStr = "SELECT MinistryTaskID,Task FROM tblMinistryTasks WHERE " & filterStr & " ORDER BY Task UNION ALL " & sqlStr
     sqlStr = "SELECT * FROM (" & sqlStr & ") temp ORDER BY MinistryTaskID"
     frm("fltrTask").RowSource = sqlStr
-    Debug.Print "Reset_fltrTask: " & Reset_fltrTask
+    
     If Reset_fltrTask Then
         frm("fltrTask") = -2
     End If
@@ -183,6 +183,10 @@ Private Sub DisplayDataLabel(frm As Form)
     Next
     
     For Each var In frm("chtTransactionsPerMinistry").ChartSeriesCollection
+        var.DisplayDataLabel = True
+    Next
+    
+    For Each var In frm("chtTransactionsPerDate").ChartSeriesCollection
         var.DisplayDataLabel = True
     Next
     
