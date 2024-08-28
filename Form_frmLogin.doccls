@@ -46,7 +46,8 @@ On Error GoTo Err_cmdLogin_Click
             .Run
         End With
         
-        open_form "frmCustomDashboard"
+        Dim IsAdmin: IsAdmin = ELookup("tblUsers", "UserID = " & UserID, "IsAdmin")
+        open_form IIf(IsAdmin, "frmCustomDashboard", "frmNonAdminDashboard")
         g_FrontEndVersion = GetGlobalSetting("Application_FrontEndVersion")
         DoCmd.Close acForm, Me.Name, acSaveNo
         

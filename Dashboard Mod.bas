@@ -46,6 +46,8 @@ Public Sub SetUp_frmCustomDashboard(Optional frmName = "frmCustomDashboard", Opt
     DoCmd.OpenForm frmName, acDesign
     Dim frm As Form: Set frm = Forms(frmName)
     
+    frm.Moveable = True
+    frm.BorderStyle = 1
     ''Center the controls
     Dim frmWidth: frmWidth = frm.Width
     
@@ -75,6 +77,10 @@ Public Sub SetUp_frmCustomDashboard(Optional frmName = "frmCustomDashboard", Opt
     
     If frmName = "frmReportDashboard" Then
         filterStr = "ParentMenu = ""Report"""
+    End If
+    
+    If frmName = "frmNonAdminDashboard" Then
+        filterStr = "ParentMenu = ""NonAdmin"""
     End If
     
     Dim sqlStr: sqlStr = "SELECT * FROM tblMainMenus WHERE " & filterStr & " ORDER BY MenuOrder"
@@ -211,7 +217,7 @@ End Function
 
 Public Function DashboardLoad(frm As Form, Optional ParentMenu = "")
     
-    ''IsExpired DateSerial(2024, 8, 30)
+    IsExpired DateSerial(2024, 8, 30)
     
     If isFalse(g_userID) Then
     

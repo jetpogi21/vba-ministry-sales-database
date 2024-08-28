@@ -6257,8 +6257,8 @@ Public Function CreateDSForm(frm2 As Form, Optional DontOpen As Boolean = False)
         End If
         
         Select Case fld.Name
-            Case "Timestamp", "CreatedBy":
-                GoTo NextField
+        Case "Timestamp", "CreatedBy":
+            GoTo NextField
         End Select
         
         Dim ControlTypeValue
@@ -6293,31 +6293,31 @@ Public Function CreateDSForm(frm2 As Form, Optional DontOpen As Boolean = False)
         End If
         
         Select Case fld.Type
-            Case dbMemo:
-                ctl.Height = 900
-                isMemo = True
-            Case dbDouble:
-                ctl.Format = "Standard"
+        Case dbMemo:
+            ctl.Height = 900
+            isMemo = True
+        Case dbDouble:
+            ctl.Format = "Standard"
             
         End Select
         
         Select Case fld.Type
         
-            Case dbDouble, dbInteger:
-                ''Create a control at the footer of the form
-                Dim footerCtl As control, footerControlCaption
-                Set footerCtl = CreateControl(frm.Name, acTextBox, acFooter, "", , 400, 600, 3000)
-                SetControlProperties footerCtl
-                footerCtl.Name = concat("Sum", rs.fields("ModelField"))
-                footerCtl.ControlSource = "=CdblNz(Sum([" & fld.Name & "]))"
+        Case dbDouble, dbInteger:
+            ''Create a control at the footer of the form
+            Dim footerCtl As control, footerControlCaption
+            Set footerCtl = CreateControl(frm.Name, acTextBox, acFooter, "", , 400, 600, 3000)
+            SetControlProperties footerCtl
+            footerCtl.Name = concat("Sum", rs.fields("ModelField"))
+            footerCtl.ControlSource = "=CdblNz(Sum([" & fld.Name & "]))"
                 
-                If IsNull(rs.fields("VerboseName")) Then
-                    footerControlCaption = AddSpaces(rs.fields("ModelField"))
-                Else
-                    footerControlCaption = rs.fields("VerboseName")
-                End If
+            If IsNull(rs.fields("VerboseName")) Then
+                footerControlCaption = AddSpaces(rs.fields("ModelField"))
+            Else
+                footerControlCaption = rs.fields("VerboseName")
+            End If
                 
-                footerCtl.Properties("DatasheetCaption") = footerControlCaption
+            footerCtl.Properties("DatasheetCaption") = footerControlCaption
                  
         End Select
         
@@ -6332,10 +6332,10 @@ Public Function CreateDSForm(frm2 As Form, Optional DontOpen As Boolean = False)
             End If
         End If
     
-'        ''Generate the label just above the control
-'        Set ctl = CreateControl(frm.Name, acLabel, , fld.Name, fld.Properties("Caption"), x, y - 300)
-'        SetControlPropertiesFromTemplate ctl, frm
-'        ctl.Width = fldWidth
+        '        ''Generate the label just above the control
+        '        Set ctl = CreateControl(frm.Name, acLabel, , fld.Name, fld.Properties("Caption"), x, y - 300)
+        '        SetControlPropertiesFromTemplate ctl, frm
+        '        ctl.Width = fldWidth
         
         CurrentCol = CurrentCol + rs.fields("Columns")
         
@@ -6415,15 +6415,15 @@ NextField:
     
     customFrmName = baseFormName
     
-'    Do Until Not FrmExist(customFrmName)
-'
-'        If MsgBox(customFrmName & " already exists. Would you like to replace it?", vbYesNo) = vbYes Then
-'            Exit Do
-'        End If
-'        i = i + 1
-'        customFrmName = baseFormName & "_" & i
-'
-'    Loop
+    '    Do Until Not FrmExist(customFrmName)
+    '
+    '        If MsgBox(customFrmName & " already exists. Would you like to replace it?", vbYesNo) = vbYes Then
+    '            Exit Do
+    '        End If
+    '        i = i + 1
+    '        customFrmName = baseFormName & "_" & i
+    '
+    '    Loop
     
     ''Insert the newly created form to the InsertToModelRelatedObjects
     InsertToModelRelatedObjects ModelID, acForm, customFrmName

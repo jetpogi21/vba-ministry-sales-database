@@ -2,6 +2,12 @@ Attribute VB_Name = "Form Operation"
 Option Compare Database
 Option Explicit
 
+Public Function CloseThisForm(frm As Form)
+
+    DoCmd.Close acForm, frm.Name, acSaveNo
+    
+End Function
+
 Public Sub CloseAllForms(Optional Exceptions = "")
     
     Dim ExceptionsArr As New clsArray
@@ -939,8 +945,8 @@ Public Function DoOpenForm(frmName, Optional whereCondition, Optional addNew As 
     
     End If
     
-    If frmName Like "main*" And Environ("ComputerName") <> "DESKTOP-3G3V8GO" Then
-    ''If frmName Like "main*" Then
+    ''If frmName Like "main*" And Environ("ComputerName") <> "DESKTOP-3G3V8GO" Then
+    If frmName Like "main*" Then
         Dim frm As Form: Set frm = Forms(frmName)
         If isPresent("tblMainMenus", "ParentMenu = ""Setup"" AND FormName = " & Esc(frmName)) Then
             frm.OnClose = "=AlwaysOpenSwitchboards(" & Esc("frmSetupDashboard") & ")"

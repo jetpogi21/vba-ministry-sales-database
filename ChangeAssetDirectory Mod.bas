@@ -3,7 +3,7 @@ Option Compare Database
 Option Explicit
 
 Public Function ChangeAssetDirectoryCreate(frm As Object, FormTypeID)
-
+    
     If FormTypeID = 4 Then
         
         frm.recordSource = ""

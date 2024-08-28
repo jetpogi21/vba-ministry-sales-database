@@ -5,6 +5,18 @@ Option Explicit
 Public ProgressPopup_StartTime As Long
 Public ProgressPopup_LastProgress As Double
 
+Public Function GetBottom(ctl As control)
+    
+    GetBottom = ctl.Top + ctl.Height
+    
+End Function
+
+Public Function GetRight(ctl As control)
+    
+    GetRight = ctl.Left + ctl.Width
+    
+End Function
+
 Public Function GetFormattedTimestamp()
 
     Dim formattedTimestamp As String

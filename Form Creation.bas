@@ -75,6 +75,19 @@ Public Function CreateLabelControl(obj As Object, Caption, controlName, Optional
     
 End Function
 
+
+Public Function CreateButtonControl(obj As Object, Caption, controlName, OnClick, Optional TemplateControlName = "ButtonControl", Optional Section As AcSection = acDetail) As CommandButton
+
+    Dim ctl As control: Set ctl = CreateFlexControl(obj.Name, acCommandButton, Section, , , 0, GetMaxY(obj, Section), obj.Width)
+    ctl.Name = controlName
+    ctl.Caption = Caption
+    ctl.OnClick = OnClick
+    CopyProperties obj, ctl.Name, TemplateControlName
+    
+    Set CreateButtonControl = ctl
+    
+End Function
+
 Public Function CreateTextboxControl(obj As Object, ControlSource, controlName, Optional labelCaption = "", Optional TemplateControlName = "TextControl", _
     Optional Section As AcSection = acDetail, Optional Hidden As Boolean = False) As TextBox
 
