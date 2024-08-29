@@ -223,7 +223,6 @@ Public Function DashboardLoad(frm As Form, Optional ParentMenu = "")
     
         ''If Environ("computername") <> "LAPTOP-4EL19IO4" Then Exit Function
         g_userID = 1
-        frm.lblLoginInfo.Caption = ""
         
     End If
     

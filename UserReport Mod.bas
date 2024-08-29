@@ -159,13 +159,56 @@ Private Sub Set_fltr_RowSource(frm As Form, Optional Reset_fltrTask As Boolean =
 End Sub
 
 Public Function frmUserReports_OnLoad(frm As Form)
-
+    
+    frmUserReports_AlignControlsBasedOnUser frm
     Set_subform_RecordSource frm
     Set_fltr_RowSource frm
     TranslateToArabic frm
     Set_fltr_AfterUpdate frm
-
+    
 End Function
+
+Public Sub frmUserReports_AlignControlsBasedOnUser(frm As Form)
+    
+    If GetIsAdmin Then Exit Sub
+    
+    Dim DistanceBetweenControls: DistanceBetweenControls = InchToTwip(0.1)
+    Dim Top: Top = frm("lblfltrUser").Top
+    ''Hide these controls
+    ''lblfltrUser,fltrUser,fltrTask,fltrMinistry,lblfltrMinistry,fltrTask,lblfltrTask,cmdOpenAnalytics
+    Dim controlArr As New clsArray: controlArr.arr = "lblfltrUser,fltrUser,fltrTask,fltrMinistry,lblfltrMinistry," & _
+        "fltrTask,lblfltrTask,cmdOpenAnalytics"
+    
+    Dim item
+    For Each item In controlArr.arr
+        frm(item).Visible = False
+    Next item
+    
+    ''Adjust the width
+    frm("lblDateFrom").Width = frm("lblDateFrom").Width * 2 / 3
+    
+    ''Move the fltrDateFrom,lblDateFrom,fltrDateTo,lblDateTo at the top position of fltrUser
+    Set controlArr = New clsArray: controlArr.arr = "lblDateFrom,fltrDateFrom,lblDateTo,fltrDateTo"
+    Dim i: i = 0
+    For Each item In controlArr.arr
+        frm(item).Top = Top
+        If i <> 0 Then
+            frm(item).Left = GetRight(frm(controlArr.arr(i - 1))) + DistanceBetweenControls
+        End If
+        i = i + 1
+    Next item
+    
+    ''Move the cmdRefresh at the right of fltrDateTo + 0.25 Inches
+    frm("cmdRefresh").Left = GetRight(frm("fltrDateTo")) + DistanceBetweenControls
+    
+    ''Move the cmdMainMenu to the left of  txtPrint - 0.25 Inches
+    frm("cmdMainMenu").Left = frm("txtPrint").Left - frm("cmdMainMenu").Width - DistanceBetweenControls
+    
+    ''Move the line and subform at the top
+    frm("Line57").Top = GetBottom(frm("lblDateFrom")) + InchToTwip(0.25)
+    frm("subform").Top = GetBottom(frm("lblDateFrom")) + InchToTwip(0.5)
+    
+End Sub
 
 Private Sub Set_fltr_AfterUpdate(frm As Form)
     

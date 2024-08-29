@@ -64,12 +64,13 @@ End Function
 
 Public Function frmAnalytics_OnLoad(frm As Form)
 
+    frmUserReports_AlignControlsBasedOnUser frm
     ''Set_subform_RecordSource frm
-    DisplayDataLabel frm
-    TranslateToArabic frm
-    Set_fltr_AfterUpdate frm
-    Set_fltr_RowSource frm
-    SetChart_QueryDefs frm
+'    DisplayDataLabel frm
+'    TranslateToArabic frm
+'    Set_fltr_AfterUpdate frm
+'    Set_fltr_RowSource frm
+'    SetChart_QueryDefs frm
     
 End Function
 

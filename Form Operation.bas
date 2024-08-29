@@ -174,7 +174,12 @@ End Sub
 
 Public Function AlwaysOpenSwitchboards(Optional frmName = "frmCustomDashboard")
     
+    If Not GetIsAdmin And frmName = "frmCustomDashboard" Then
+        frmName = "frmNonAdminDashboard"
+    End If
+    
     If Not IsFormOpen(frmName) Then
+        
         DoCmd.OpenForm frmName
     End If
     
